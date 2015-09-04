@@ -57,7 +57,7 @@ class postfix (
   assert_type(Array[String], $destinations)
   assert_type(Array[String], $mynetworks)
 
-  ::debconf_package {'postfix':
+  debconf_package {'postfix':
     ensure  => present,
     content => template('postfix/preseed.erb'),
   }
