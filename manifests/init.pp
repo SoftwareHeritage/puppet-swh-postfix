@@ -7,11 +7,6 @@
 # [*relayhost*]
 #    Set the relayhost for the machine
 #
-# [*main_mailer_type*]
-#    Set the main mailer type as would be asked through debconf.
-#    Values: 'No configuration', 'Internet Site', 'Internet with smarthost', 'Satellite system', 'Local only'
-#    Default: 'Satellite system'
-#
 # [*root_address*]
 #    Set the forward address for mail sent to root.
 #    Default: '' (keeping the current root alias)
@@ -43,7 +38,6 @@
 #
 class postfix (
   $relayhost        = undef,
-  $main_mailer_type = 'Satellite system',
   $root_address     = '',
   $mailname         = $::fqdn,
   $destinations     = [$::fqdn],
@@ -57,8 +51,30 @@ class postfix (
   assert_type(Array[String], $destinations)
   assert_type(Array[String], $mynetworks)
 
-  debconf_package {'postfix':
+  package {'postfix':
     ensure  => present,
-    content => template('postfix/preseed.erb'),
+  }
+
+  service {'postfix':
+    ensure => running,
+    enable => true,
+    require => [
+      File['/etc/postfix/main.cf'],
+      File['/etc/postfix/master.cf'],
+    ],
+  }
+
+  file {'/etc/postfix/main.cf':
+    ensure  => present,
+    content => template('postfix/main.cf.erb'),
+    notify  => Service['postfix'],
+    require => Package['postfix'],
+  }
+
+  file {'/etc/postfix/master.cf':
+    ensure  => present,
+    content => template('postfix/master.cf.erb'),
+    notify  => Service['postfix'],
+    require => Package['postfix'],
   }
 }
