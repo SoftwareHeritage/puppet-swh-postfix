@@ -29,6 +29,13 @@
 #    Example: {
 #      'forge.softwareheritage.org' => 'smtp:[tate.internal.softwareheritage.org]'
 #    }
+#
+# [*virtual_aliases*]
+#    Hash of virtual aliases
+#    Default: {} (no virtual aliases)
+#    Example: {
+#      '@forge.softwareheritage.org' => 'forge-virtual-user'
+#    }
 # === Examples
 #
 #  class { 'postfix':
@@ -50,6 +57,7 @@ class postfix (
   $destinations       = [$::fqdn],
   $mynetworks         = ['127.0.0.0/8', '[::ffff:127.0.0.0]/104', '[::1]/128'],
   $relay_destinations = {},
+  $virtual_aliases    = {},
 ){
 
   validate_string($relayhost)
@@ -59,6 +67,7 @@ class postfix (
   assert_type(Array[String], $destinations)
   assert_type(Array[String], $mynetworks)
   assert_type(Hash[String, String], $relay_destinations)
+  assert_type(Hash[String, String], $virtual_aliases)
 
   package {'postfix':
     ensure  => present,
@@ -71,6 +80,7 @@ class postfix (
       File['/etc/postfix/main.cf'],
       File['/etc/postfix/master.cf'],
       File['/etc/postfix/transport'],
+      File['/etc/postfix/virtual'],
     ],
   }
 
@@ -95,9 +105,22 @@ class postfix (
     require => Package['postfix'],
   }
 
+  file {'/etc/postfix/virtual':
+    ensure  => present,
+    content => template('postfix/virtual.erb'),
+    notify  => Exec['update virtual'],
+    require => Package['postfix'],
+  }
+
   exec {'update transport':
     path        => ['/usr/bin', '/usr/sbin'],
     command     => 'postmap /etc/postfix/transport',
+    refreshonly => true,
+  }
+
+  exec {'update virtual':
+    path        => ['/usr/bin', '/usr/sbin'],
+    command     => 'postmap /etc/postfix/virtual',
     refreshonly => true,
   }
 }

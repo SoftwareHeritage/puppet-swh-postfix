@@ -38,3 +38,5 @@ recipient_delimiter = +
 inet_interfaces = all
 relay_domains = <%= @relay_destinations.keys.join(", ") %>
 transport_maps = hash:/etc/postfix/transport
+virtual_alias_domains = <%= @virtual_aliases.keys.each { |a| a.split('@').at(-1) }.uniq.join(", ") %>
+virtual_alias_maps = hash:/etc/postfix/virtual

@@ -1,0 +1,6 @@
+# Postfix virtual alias map map
+# Managed by puppet, manual changes will be erased
+
+<% @virtual_aliases.each do |alias_, destination| -%>
+<%= alias_ %> <%= destination %>
+<% end -%>
