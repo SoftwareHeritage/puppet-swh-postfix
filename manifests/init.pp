@@ -58,7 +58,7 @@ class postfix (
   validate_string($mailname)
   assert_type(Array[String], $destinations)
   assert_type(Array[String], $mynetworks)
-  assert_type(Hash[String, String], $transports)
+  assert_type(Hash[String, String], $relay_destinations)
 
   package {'postfix':
     ensure  => present,
