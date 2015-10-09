@@ -22,6 +22,13 @@
 # [*mynetworks*]
 #    Array of networks from which to accept mail
 #    Default: ['127.0.0.0/8', '[::ffff:127.0.0.0]/104', '[::1]/128'] (only accept local mail)
+#
+# [*relay_destinations*]
+#    Hash of destinations for relayed mail
+#    Default: {} (no relayed mail)
+#    Example: {
+#      'forge.softwareheritage.org' => 'smtp:[tate.internal.softwareheritage.org]'
+#    }
 # === Examples
 #
 #  class { 'postfix':
@@ -37,11 +44,12 @@
 # Copyright 2015 Nicolas Dandrimont
 #
 class postfix (
-  $relayhost        = undef,
-  $root_address     = '',
-  $mailname         = $::fqdn,
-  $destinations     = [$::fqdn],
-  $mynetworks       = ['127.0.0.0/8', '[::ffff:127.0.0.0]/104', '[::1]/128'],
+  $relayhost          = undef,
+  $root_address       = '',
+  $mailname           = $::fqdn,
+  $destinations       = [$::fqdn],
+  $mynetworks         = ['127.0.0.0/8', '[::ffff:127.0.0.0]/104', '[::1]/128'],
+  $relay_destinations = {},
 ){
 
   validate_string($relayhost)
@@ -50,17 +58,19 @@ class postfix (
   validate_string($mailname)
   assert_type(Array[String], $destinations)
   assert_type(Array[String], $mynetworks)
+  assert_type(Hash[String, String], $transports)
 
   package {'postfix':
     ensure  => present,
   }
 
   service {'postfix':
-    ensure => running,
-    enable => true,
+    ensure  => running,
+    enable  => true,
     require => [
       File['/etc/postfix/main.cf'],
       File['/etc/postfix/master.cf'],
+      File['/etc/postfix/transport'],
     ],
   }
 
@@ -76,5 +86,18 @@ class postfix (
     content => template('postfix/master.cf.erb'),
     notify  => Service['postfix'],
     require => Package['postfix'],
+  }
+
+  file {'/etc/postfix/transport':
+    ensure  => present,
+    content => template('postfix/transport.erb'),
+    notify  => Exec['update transport'],
+    require => Package['postfix'],
+  }
+
+  exec {'update transport':
+    path        => ['/usr/bin', '/usr/sbin'],
+    command     => 'postmap /etc/postfix/transport',
+    refreshonly => true,
   }
 }

@@ -36,3 +36,5 @@ mynetworks = <%= @mynetworks.join(" ") %>
 mailbox_size_limit = 0
 recipient_delimiter = +
 inet_interfaces = all
+relay_domains = <%= @relay_destinations.keys.join(", ") %>
+transport_maps = hash:/etc/postfix/transport

@@ -1,0 +1,6 @@
+# Postfix transport map
+# Managed by puppet, manual changes will be erased
+
+<% @relay_destinations.each do |domain, destination| -%>
+<%= domain %> <%= destination %>
+<% end -%>
