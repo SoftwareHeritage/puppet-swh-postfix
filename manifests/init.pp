@@ -54,7 +54,7 @@ class postfix (
   $relayhost          = undef,
   $root_address       = '',
   $mailname           = $::fqdn,
-  $destinations       = [$::fqdn],
+  $mydestination      = [$::fqdn],
   $mynetworks         = ['127.0.0.0/8', '[::ffff:127.0.0.0]/104', '[::1]/128'],
   $relay_destinations = {},
   $virtual_aliases    = {},
@@ -64,7 +64,7 @@ class postfix (
   validate_string($main_mailer_type)
   validate_string($root_address)
   validate_string($mailname)
-  assert_type(Array[String], $destinations)
+  assert_type(Array[String], $mydestination)
   assert_type(Array[String], $mynetworks)
   assert_type(Hash[String, String], $relay_destinations)
   assert_type(Hash[String, String], $virtual_aliases)
