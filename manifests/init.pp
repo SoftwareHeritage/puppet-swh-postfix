@@ -61,7 +61,6 @@ class postfix (
 ){
 
   validate_string($relayhost)
-  validate_string($main_mailer_type)
   validate_string($root_address)
   validate_string($mailname)
   assert_type(Array[String], $mydestination)
