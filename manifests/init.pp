@@ -122,4 +122,18 @@ class postfix (
     command     => 'postmap /etc/postfix/virtual',
     refreshonly => true,
   }
+
+  file {'/etc/postfix/client_checks':
+    ensure  => present,
+    content => template('postfix/client_checks.erb'),
+    notify  => Exec['update client_checks'],
+    require => Package['postfix'],
+  }
+
+  exec {'update client_checks':
+    path        => ['/usr/bin', '/usr/sbin'],
+    command     => 'postmap /etc/postfix/client_checks',
+    refreshonly => true,
+  }
+
 }
