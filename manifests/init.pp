@@ -56,6 +56,7 @@ class postfix (
   $mailname           = $::fqdn,
   $mydestination      = [$::fqdn],
   $mynetworks         = ['127.0.0.0/8', '[::ffff:127.0.0.0]/104', '[::1]/128'],
+  $aliases_files      = ['/etc/aliases'],
   $relay_destinations = {},
   $virtual_aliases    = {},
 ){

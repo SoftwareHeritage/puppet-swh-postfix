@@ -29,8 +29,8 @@ smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_una
 smtpd_recipient_restrictions = check_client_access cidr:/etc/postfix/client_checks
 
 myhostname = <%= @mailname %>
-alias_maps = hash:/etc/aliases
-alias_database = hash:/etc/aliases
+alias_maps = <%= @aliases_files.map { |f| "hash:#{f}" }.join(", ") %>
+alias_database = <%= @aliases_files.map { |f| "hash:#{f}" }.join(", ") %>
 myorigin = <%= @mailname %>
 mydestination = <%= @mydestination.join(", ") %>
 relayhost = <%= @relayhost %>
